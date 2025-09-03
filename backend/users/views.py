@@ -9,6 +9,7 @@ import jwt
 from datetime import datetime, timezone
 from django.conf import settings
 from functools import wraps
+import os
 
 def make_access_token(user_dict: dict):
     now = datetime.now(timezone.utc)
@@ -32,7 +33,7 @@ def jwt_required(view_func):
     def _wrapped(request, *args, **kwargs):
         token = request.COOKIES.get("access_token")
         if not token:
-            return JsonResponse({"detail": "No autenticado"}, status=401)
+            return render(request, 'login.html')
         try:
             payload = decode_token(token)
         except jwt.ExpiredSignatureError:
@@ -71,7 +72,18 @@ def ConfigurationPage(request):
 
 @jwt_required
 def ProductsPage(request):
-    return render(request, 'productos_dashboard.html')
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT * FROM obtener_datos_productos()')
+            cols = [col[0] for col in cursor.description]
+            resultados_productos = [dict(zip(cols, row)) for row in cursor.fetchall()]
+
+            cursor.execute('SELECT * FROM obtener_categorias()')
+            resultados_categorias = [dict(zip(cols, row)) for row in cursor.fetchall()]
+
+            return render(request, 'productos_dashboard.html', {"productos": resultados_productos, "categorias": resultados_categorias})
+    except DatabaseError as e:
+        return HttpResponse(f"<h1>Error en la BD: {str(e)}</h1>", status=400)
 
 @jwt_required
 def PedidosPage(request):
@@ -84,6 +96,9 @@ def UsuariosPage(request):
 @jwt_required
 def DomiciliosPage(request):
     return render(request, 'domicilios.html')
+
+def HomePage(request):
+    return render(request, 'home.html')
 
 @jwt_required   
 def ResumenPage(request):
@@ -243,5 +258,142 @@ def ObtenerDatosActualizables(request):
 
                 if result:
                     return JsonResponse({"datos": result}, status=200)
+        except DatabaseError as e:
+            return HttpResponse(f"<h1>Error en la BD: {str(e)}</h1>", status=400)
+        
+@csrf_exempt
+def RegistrarProductoView(request):
+    if request.method == "POST":
+        try:
+            # === OBTENER DATOS DEL FORM ===
+            nombre = request.POST.get("nombre", "").strip()
+            categoria_id = request.POST.get("cat_id")
+            descripcion = request.POST.get("descripcion", "").strip()
+            precio = request.POST.get("precio")
+            stock = request.POST.get("stock")
+
+            imagen = request.FILES.get("imagen")  # Puede ser None
+            ruta_imagen = None
+
+            # === VALIDACIONES BÁSICAS ===
+            if not nombre or not categoria_id or not precio or stock is None:
+                return JsonResponse({"detail": "Campos obligatorios faltantes."}, status=400)
+
+            try:
+                precio = float(precio)
+                stock = int(stock)
+            except ValueError:
+                return JsonResponse({"detail": "Precio o stock inválidos."}, status=400)
+
+            # === GUARDAR IMAGEN SI EXISTE ===
+            if imagen:
+                ext = os.path.splitext(imagen.name)[1].lower()
+                if ext not in [".jpg", ".jpeg", ".png"]:
+                    return JsonResponse({"detail": "Formato de imagen no válido. Solo JPG o PNG."}, status=400)
+
+                # Carpeta donde se guardarán las imágenes
+                upload_dir = os.path.join(settings.MEDIA_ROOT, "productos")
+                os.makedirs(upload_dir, exist_ok=True)
+
+                # Guardar archivo
+                file_name = f"{nombre.replace(' ', '_')}{ext}"
+                file_path = os.path.join(upload_dir, file_name)
+
+                with open(file_path, "wb+") as destination:
+                    for chunk in imagen.chunks():
+                        destination.write(chunk)
+
+                # Ruta que se guardará en BD
+                ruta_imagen = f"productos/{file_name}"
+
+            # === EJECUTAR FUNCIÓN SQL ===
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT crear_producto(%s, %s, %s, %s, %s, %s)",
+                    [nombre, categoria_id, descripcion, stock, precio, ruta_imagen]
+                )
+                nuevo_id = cursor.fetchone()[0]
+
+            return JsonResponse({
+                "success": True,
+                "message": "Producto creado exitosamente.",
+                "id": nuevo_id,
+                "imagen": ruta_imagen
+            }, status=201)
+
+        except Exception as e:
+            return JsonResponse({"detail": str(e)}, status=500)
+        
+    elif request.method in ["PUT", "PATCH"]:
+        try:
+            # Django no parsea automáticamente FormData en PUT,
+            # así que usamos request.POST y request.FILES igual que con POST
+            prod_id = request.POST.get("prod_id")
+            nombre = request.POST.get("nombre", "").strip()
+            descripcion = request.POST.get("descripcion", "").strip()
+            categoria = request.POST.get("cat_id")
+            precio = request.POST.get("precio")
+            stock = request.POST.get("stock")
+            imagen = request.FILES.get("imagen")
+            ruta_imagen = None
+
+            if not prod_id or not nombre or not categoria or not precio or stock is None:
+                return JsonResponse({"detail": "Campos obligatorios faltantes."}, status=400)
+
+            try:
+                precio = float(precio)
+                stock = int(stock)
+            except ValueError:
+                return JsonResponse({"detail": "Precio o stock inválidos."}, status=400)
+
+            # Guardar imagen si se envía
+            if imagen:
+                ext = os.path.splitext(imagen.name)[1].lower()
+                if ext not in [".jpg", ".jpeg", ".png"]:
+                    return JsonResponse({"detail": "Formato no válido. Solo JPG o PNG."}, status=400)
+
+                upload_dir = os.path.join(settings.MEDIA_ROOT, "productos")
+                os.makedirs(upload_dir, exist_ok=True)
+
+                file_name = f"{nombre.replace(' ', '_')}{ext}"
+                file_path = os.path.join(upload_dir, file_name)
+
+                with open(file_path, "wb+") as destination:
+                    for chunk in imagen.chunks():
+                        destination.write(chunk)
+
+                ruta_imagen = f"productos/{file_name}"
+
+            # === Ejecutar función SQL ===
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT actualizar_producto(%s, %s, %s, %s, %s, %s, %s)",
+                    [prod_id, nombre, descripcion, categoria, precio, stock, ruta_imagen]
+                )
+                updated_id = cursor.fetchone()[0]
+
+            return JsonResponse({
+                "success": True,
+                "message": "Producto actualizado correctamente.",
+                "id": updated_id,
+                "imagen": ruta_imagen
+            }, status=200)
+
+        except Exception as e:
+            return JsonResponse({"detail": str(e)}, status=500)
+
+    return JsonResponse({"detail": "Método no permitido."}, status=405)
+
+@csrf_exempt
+def ObtenerCategoriasView(request):
+    if request.method == "GET":
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute('SELECT * FROM obtener_categorias()')
+                cols = [col[0] for col in cursor.description]
+                resultados_categorias = [dict(zip(cols, row)) for row in cursor.fetchall()]
+
+                return JsonResponse({'exito': resultados_categorias}, status=200)
+
         except DatabaseError as e:
             return HttpResponse(f"<h1>Error en la BD: {str(e)}</h1>", status=400)

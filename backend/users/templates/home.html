@@ -1,0 +1,71 @@
+{% extends "base_public.html" %}
+
+{% block title %}Inicio - Mis Viejos{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1>Bienvenido a Mis Viejos</h1>
+        <p>Tu bodega online de confianza</p>
+        <a href="#" class="btn btn-primary btn-lg mt-3">Explorar Productos</a>
+    </div>
+</section>
+
+<!-- Productos destacados -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Productos Destacados</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card shadow-sm">
+                    <img src="https://picsum.photos/300/200?1" class="card-img-top" alt="producto">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Producto 1</h5>
+                        <p class="card-text">$10.00</p>
+                        <a href="#" class="btn btn-primary btn-sm">Ver más</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Puedes duplicar estas columnas para simular más productos -->
+            <div class="col-md-3">
+                <div class="card shadow-sm">
+                    <img src="https://picsum.photos/300/200?2" class="card-img-top" alt="producto">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Producto 2</h5>
+                        <p class="card-text">$15.00</p>
+                        <a href="#" class="btn btn-primary btn-sm">Ver más</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Cómo funciona -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">¿Cómo funciona?</h2>
+        <div class="row text-center g-4">
+            <div class="col-md-3">
+                <div class="step-icon">🛒</div>
+                <h5>Elige tu producto</h5>
+            </div>
+            <div class="col-md-3">
+                <div class="step-icon">💳</div>
+                <h5>Selecciona método de pago</h5>
+            </div>
+            <div class="col-md-3">
+                <div class="step-icon">📍</div>
+                <h5>Marca la ubicación</h5>
+            </div>
+            <div class="col-md-3">
+                <div class="step-icon">🚚</div>
+                <h5>Espera tu entrega</h5>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

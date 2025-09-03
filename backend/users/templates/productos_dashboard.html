@@ -4,17 +4,20 @@
 
 {% block title %}Gestión de Productos{% endblock %}
 
-{% block link %}<link rel="stylesheet" href="{% static 'css/dashboard_admin.css' %}">{% endblock %}
+{% block link %}
+<link rel="stylesheet" href="{% static 'css/dashboard_admin.css' %}">
+{% endblock %}
 
-{% block bootstrap %}<!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block bootstrap %}
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
 
     <!-- Encabezado -->
-    <h2 class="mb-4">📦 Gestión de Productos</h2>
+    <h2 class="mb-4">📦 Gestión de Productos y Categorías</h2>
 
     <!-- Cards resumen -->
     <div class="row mb-4">
@@ -56,7 +59,51 @@
         </div>
     </div>
 
-    <!-- Tabla de productos -->
+    <!-- Sección de Categorías -->
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">📂 Categorías registradas</h5>
+                    <table class="table table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos dummy, luego vendrán de Django -->
+                            {% if categorias %}
+                                {% for categoria in categorias %}
+                                    <tr>
+                                        <td>{{ categoria.res_id }}</td>
+                                        <td>{{ categoria.res_nombre }}</td>
+                                        <td>{{ categoria.res_descripcion }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalEditarCategoria">Editar</button>
+                                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalEliminarCategoria">Eliminar</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td>No se encuentran categorias registradas</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAgregarCategoria">
+                        ➕ Agregar Categoría
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Productos -->
     <div class="row">
         <div class="col-md-12">
             <div class="card shadow-sm">
@@ -69,59 +116,246 @@
                                 <th>Nombre</th>
                                 <th>Precio</th>
                                 <th>Stock</th>
+                                <th>Categoría</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>Vino Tinto Clásico</td>
-                                <td>$12.50</td>
-                                <td>35</td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary">Editar</button>
-                                    <button class="btn btn-sm btn-danger">Eliminar</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Ron Añejo</td>
-                                <td>$20.00</td>
-                                <td>12</td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary">Editar</button>
-                                    <button class="btn btn-sm btn-danger">Eliminar</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>Cerveza Artesanal</td>
-                                <td>$3.50</td>
-                                <td>60</td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary">Editar</button>
-                                    <button class="btn btn-sm btn-danger">Eliminar</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>Whisky Premium</td>
-                                <td>$45.00</td>
-                                <td>7</td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary">Editar</button>
-                                    <button class="btn btn-sm btn-danger">Eliminar</button>
-                                </td>
-                            </tr>
+                            <!-- Datos dummy, luego vendrán de Django -->
+                            {% if productos %}
+                                {% for producto in productos %}
+                                    <tr>
+                                        <td>{{ producto.res_id }}</td>
+                                        <td>{{ producto.res_nombre }}</td>
+                                        <td>$ {{ producto.res_precio }}</td>
+                                        <td>{{ producto.res_stock }}</td>
+                                        <td>{{ producto.res_categoria }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary btnEditarProducto" data-bs-toggle="modal" data-bs-target="#modalEditarProducto" 
+                                            data-id="{{ producto.res_id }}" data-nombre="{{ producto.res_nombre }}" data-descripcion="{{producto.res_descripcion}}" data-precio="{{ producto.res_precio }}" data-cat_id="{{ producto.res_categoria_id }}" data-stock="{{ producto.res_stock }}">Editar</button>
+                                            
+                                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalEliminarProducto">Eliminar</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td>No se encuentran productos registrados</td>
+                                </tr>
+                            {% endif %}
                         </tbody>
                     </table>
-                    <button class="btn btn-success">➕ Agregar Producto</button>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAgregarProducto">➕ Agregar Producto</button>
                 </div>
             </div>
         </div>
     </div>
 
 </div>
+<!-- ================= MODALS CATEGORÍAS ================= -->
+
+<!-- Modal Agregar Categoría -->
+<div class="modal fade" id="modalAgregarCategoria" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">➕ Agregar Categoría</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formAgregarCategoria">
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" name="nombre" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" name="descripcion"></textarea>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Guardar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Categoría -->
+<div class="modal fade" id="modalEditarCategoria" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">✏️ Editar Categoría</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formEditarCategoria">
+          <input type="hidden" name="cat_id">
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" name="nombre" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" name="descripcion"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Actualizar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Eliminar Categoría -->
+<div class="modal fade" id="modalEliminarCategoria" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">🗑️ Eliminar Categoría</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar esta categoría?</p>
+        <form id="formEliminarCategoria">
+          <input type="hidden" name="cat_id">
+          <button type="submit" class="btn btn-danger w-100">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODALS PRODUCTOS ================= -->
+
+<!-- Modal Agregar Producto -->
+<div class="modal fade" id="modalAgregarProducto" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">➕ Agregar Producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formAgregarProducto" enctype="multipart/form-data">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-control" name="nombre" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Categoría</label>
+              <select class="form-select" name="cat_id" required>
+                <option selected disabled>Seleccione una categoría</option>
+                {% if categorias %}
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.res_id }}">{{ categoria.res_nombre }}</option>
+                    {% endfor %}
+                {% else %}
+                    <option>No hay categorias registradas</option>
+                {% endif %}
+                <!-- Opciones dinámicas desde Django -->
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" name="descripcion"></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Precio</label>
+              <input type="number" step="0.01" class="form-control" name="precio" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Stock</label>
+              <input type="number" class="form-control" name="stock" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Imagen</label>
+              <input type="file" class="form-control" name="imagen" accept="image/*">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Guardar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Producto -->
+<div class="modal fade" id="modalEditarProducto" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">✏️ Editar Producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formEditarProducto" enctype="multipart/form-data">
+          <input type="hidden" name="prod_id">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-control" name="nombre" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Categoría</label>
+              <select class="form-select" name="cat_id" required>
+                <!-- Opciones dinámicas -->
+                 {% if categorias %}
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.res_id }}">{{ categoria.res_nombre }}</option>
+                    {% endfor %}
+                {% else %}
+                    <option>No hay categorias registradas</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" name="descripcion"></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Precio</label>
+              <input type="number" step="0.01" class="form-control" name="precio" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Stock</label>
+              <input type="number" class="form-control" name="stock" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Imagen</label>
+              <input type="file" class="form-control" name="imagen" accept="image/*">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Actualizar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Eliminar Producto -->
+<div class="modal fade" id="modalEliminarProducto" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">🗑️ Eliminar Producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar este producto?</p>
+        <form id="formEliminarProducto">
+          <input type="hidden" name="prod_id">
+          <button type="submit" class="btn btn-danger w-100">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 {% endblock %}
 
 {% block extra_scripts %}
@@ -129,7 +363,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const menu = document.querySelector('.menu');
-    menu.children[1].classList.add('active')
+    menu.children[1].classList.add('active');
     
     const ctx = document.getElementById('chartProductos').getContext('2d');
     new Chart(ctx, {
@@ -144,13 +378,181 @@
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
         }
     });
 </script>
+<script>
+const formAddProduct = document.getElementById('formAgregarProducto');
+
+formAddProduct.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Obtener los valores del formulario
+    const nombre = formAddProduct.nombre.value.trim();
+    const cat_id = formAddProduct.cat_id.value;
+    const descripcion = formAddProduct.descripcion.value.trim();
+    const precio = formAddProduct.precio.value;
+    const stock = formAddProduct.stock.value;
+    const imagen = formAddProduct.imagen.files[0];
+
+    // ==== VALIDACIONES ====
+    if (!nombre) {
+        alert("⚠️ El nombre del producto es obligatorio.");
+        return;
+    }
+
+    if (!cat_id || cat_id === "Seleccione una categoría") {
+        alert("⚠️ Debe seleccionar una categoría.");
+        return;
+    }
+
+    if (!precio || isNaN(precio) || Number(precio) <= 0) {
+        alert("⚠️ El precio debe ser un número válido mayor que 0.");
+        return;
+    }
+
+    if (!stock || isNaN(stock) || Number(stock) < 0) {
+        alert("⚠️ El stock debe ser un número válido mayor o igual a 0.");
+        return;
+    }
+
+    if (imagen) {
+        const allowedTypes = ["image/jpeg", "image/png"];
+        if (!allowedTypes.includes(imagen.type)) {
+            alert("⚠️ La imagen debe estar en formato JPG o PNG.");
+            return;
+        }
+    }
+
+    // ==== PREPARAR FORM DATA ====
+    const formData = new FormData();
+    formData.append("nombre", nombre);
+    formData.append("cat_id", cat_id);
+    formData.append("descripcion", descripcion);
+    formData.append("precio", precio);
+    formData.append("stock", stock);
+    if (imagen) formData.append("imagen", imagen);
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/users/products/register", {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert("✅ Producto registrado correctamente.");
+            formAddProduct.reset();
+            // Opcional: cerrar modal después de guardar
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalAgregarProducto'));
+            modal.hide();
+        } else {
+            const errorData = await response.json();
+            alert("❌ Error al registrar el producto: " + (errorData.detail || "Verifique los datos."));
+        }
+    } catch (error) {
+        console.error("Error en la solicitud:", error);
+        alert("❌ Ocurrió un error al conectar con el servidor.");
+    }
+});
+</script>
+
+<!-- logica para modalActualizarProducto -->
+ <script>
+const formEditProduct = document.getElementById('formEditarProducto');
+
+formEditProduct.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // === OBTENER VALORES DEL FORM ===
+    const prod_id = formEditProduct.prod_id.value;
+    const nombre = formEditProduct.nombre.value.trim();
+    const descripcion = formEditProduct.descripcion.value.trim();
+    const cat_id = formEditProduct.cat_id.value;
+    const precio = formEditProduct.precio.value;
+    const stock = formEditProduct.stock.value;
+    const imagen = formEditProduct.imagen.files[0];
+    console.log(prod_id)
+    // === VALIDACIONES ===
+    if (!prod_id) {
+        alert("⚠️ No se encontró el ID del producto.");
+        return;
+    }
+    if (!nombre) {
+        alert("⚠️ El nombre es obligatorio.");
+        return;
+    }
+    if (!cat_id) {
+        alert("⚠️ Debe seleccionar una categoría.");
+        return;
+    }
+    if (!precio || isNaN(precio) || Number(precio) <= 0) {
+        alert("⚠️ Precio inválido.");
+        return;
+    }
+    if (!stock || isNaN(stock) || Number(stock) < 0) {
+        alert("⚠️ Stock inválido.");
+        return;
+    }
+    if (imagen) {
+        const allowedTypes = ["image/jpeg", "image/png"];
+        if (!allowedTypes.includes(imagen.type)) {
+            alert("⚠️ Solo se permiten imágenes JPG o PNG.");
+            return;
+        }
+    }
+
+    // === FORM DATA ===
+    const formData = new FormData();
+    formData.append("prod_id", prod_id);
+    formData.append("nombre", nombre);
+    formData.append("descripcion", descripcion);
+    formData.append("cat_id", cat_id);
+    formData.append("precio", precio);
+    formData.append("stock", stock);
+    if (imagen) formData.append("imagen", imagen);
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/users/products/register", {
+            method: "PUT", // cambiamos a PUT
+            body: formData
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert("✅ Producto actualizado correctamente.");
+            formEditProduct.reset();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditarProducto'));
+            modal.hide();
+        } else {
+            const errorData = await response.json();
+            alert("❌ Error al actualizar: " + (errorData.detail || "Revise los datos."));
+        }
+    } catch (error) {
+        console.error(error);
+        alert("❌ Error de conexión con el servidor.");
+    }
+});
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('.btnEditarProducto').forEach(button => {
+            button.addEventListener('click', () => {
+                const form = document.getElementById("formEditarProducto")
+
+                form.prod_id.value = button.dataset.id;
+                form.nombre.value = button.dataset.nombre;
+                form.descripcion.value = button.dataset.descripcion;
+                form.cat_id.value = button.dataset.cat_id;
+                form.precio.value = button.dataset.precio;
+                form.stock.value = button.dataset.stock;
+            })
+        })
+    })
+
+    
+</script>
+
 {% endblock %}
