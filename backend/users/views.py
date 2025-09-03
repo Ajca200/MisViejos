@@ -1,7 +1,9 @@
 from rest_framework import generics, status
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, QueryDict
 from django.shortcuts import render, redirect
 from django.db import connection, DatabaseError
 from django.urls import reverse
@@ -329,8 +331,9 @@ def RegistrarProductoView(request):
         try:
             # Django no parsea automáticamente FormData en PUT,
             # así que usamos request.POST y request.FILES igual que con POST
-            data = json.loads(request.body)
+            data = QueryDict(request.body)
             print(data)
+            print(data.get('nombre'))
             prod_id = request.POST.get("prod_id")
             nombre = request.POST.get("nombre", "").strip()
             descripcion = request.POST.get("descripcion", "").strip()
@@ -403,3 +406,65 @@ def ObtenerCategoriasView(request):
 
         except DatabaseError as e:
             return HttpResponse(f"<h1>Error en la BD: {str(e)}</h1>", status=400)
+        
+@api_view(["PUT"])
+@parser_classes([MultiPartParser, FormParser])
+def ActualizarProducto(request):
+    try:
+            # Django no parsea automáticamente FormData en PUT,
+            # así que usamos request.POST y request.FILES igual que con POST
+    
+            prod_id = request.data.get("prod_id")
+            nombre = request.data.get("nombre", "").strip()
+            descripcion = request.data.get("descripcion", "").strip()
+            categoria = request.data.get("cat_id")
+            precio = request.data.get("precio")
+            stock = request.data.get("stock")
+            imagen = request.data.get("imagen")
+            ruta_imagen = None
+
+            print(categoria)
+            if not prod_id or not nombre or not categoria or not precio or stock is None:
+                return JsonResponse({"detail": "Campos obligatorios faltantes."}, status=400)
+
+            try:
+                precio = float(precio)
+                stock = int(stock)
+            except ValueError:
+                return JsonResponse({"detail": "Precio o stock inválidos."}, status=400)
+
+            # Guardar imagen si se envía
+            if imagen:
+                ext = os.path.splitext(imagen.name)[1].lower()
+                if ext not in [".jpg", ".jpeg", ".png"]:
+                    return JsonResponse({"detail": "Formato no válido. Solo JPG o PNG."}, status=400)
+
+                upload_dir = os.path.join(settings.MEDIA_ROOT, "productos")
+                os.makedirs(upload_dir, exist_ok=True)
+
+                file_name = f"{nombre.replace(' ', '_')}{ext}"
+                file_path = os.path.join(upload_dir, file_name)
+
+                with open(file_path, "wb+") as destination:
+                    for chunk in imagen.chunks():
+                        destination.write(chunk)
+
+                ruta_imagen = f"productos/{file_name}"
+
+            # === Ejecutar función SQL ===
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT actualizar_producto(%s, %s, %s, %s, %s, %s, %s)",
+                    [prod_id, nombre, descripcion, categoria, precio, stock, ruta_imagen]
+                )
+                updated_id = cursor.fetchone()[0]
+
+            return JsonResponse({
+                "success": True,
+                "message": "Producto actualizado correctamente.",
+                "id": updated_id,
+                "imagen": ruta_imagen
+            }, status=200)
+
+    except Exception as e:
+            return JsonResponse({"detail": str(e)}, status=500)
