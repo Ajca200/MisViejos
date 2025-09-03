@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from django.conf import settings
 from functools import wraps
 import os
+import json
 
 def make_access_token(user_dict: dict):
     now = datetime.now(timezone.utc)
@@ -324,10 +325,12 @@ def RegistrarProductoView(request):
         except Exception as e:
             return JsonResponse({"detail": str(e)}, status=500)
         
-    elif request.method in ["PUT", "PATCH"]:
+    elif request.method == "PUT":
         try:
             # Django no parsea automáticamente FormData en PUT,
             # así que usamos request.POST y request.FILES igual que con POST
+            data = json.loads(request.body)
+            print(data)
             prod_id = request.POST.get("prod_id")
             nombre = request.POST.get("nombre", "").strip()
             descripcion = request.POST.get("descripcion", "").strip()
@@ -337,6 +340,9 @@ def RegistrarProductoView(request):
             imagen = request.FILES.get("imagen")
             ruta_imagen = None
 
+            print(prod_id)
+            print(nombre)
+            print(descripcion)
             if not prod_id or not nombre or not categoria or not precio or stock is None:
                 return JsonResponse({"detail": "Campos obligatorios faltantes."}, status=400)
 
