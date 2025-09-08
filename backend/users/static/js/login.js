@@ -1,43 +1,68 @@
+// Elementos principales
 const input_email = document.getElementById('email');
 const input_password = document.getElementById('password');
 const btn_submit = document.getElementById('btn-submit');
 const btn_register = document.getElementById('btn-register');
+
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-const active_btn_submit = [false, false];
+// Estado de validaciones
+let isEmailValid = false;
+let isPasswordValid = false;
 
-const active_btn = () => {
-    if (active_btn_submit[0] && active_btn_submit[1]){
-        btn_submit.disabled = false;
-    } else {
-        btn_submit.disabled = true;
+// 🔹 Función para mostrar errores
+function showError(input, message) {
+    let errorSpan = input.parentElement.querySelector(".error-message");
+    if (!errorSpan) {
+        errorSpan = document.createElement("span");
+        errorSpan.classList.add("error-message");
+        input.parentElement.appendChild(errorSpan);
     }
+    errorSpan.textContent = message;
+    input.classList.add("input-error");
 }
 
-input_email.addEventListener('input', (e) => {
+// 🔹 Función para limpiar errores
+function clearError(input) {
+    const errorSpan = input.parentElement.querySelector(".error-message");
+    if (errorSpan) errorSpan.remove();
+    input.classList.remove("input-error");
+}
+
+// 🔹 Habilitar o deshabilitar el botón
+function toggleSubmit() {
+    btn_submit.disabled = !(isEmailValid && isPasswordValid);
+}
+
+// 🔹 Validación del email
+input_email.addEventListener("input", (e) => {
     const email = e.target.value.trim();
 
-    if (email.length <= 4 || !emailRegex.test(email)){
-        input_email.classList.add('input-error');
+    if (email.length <= 4 || !emailRegex.test(email)) {
+        isEmailValid = false;
+        showError(input_email, "Ingresa un correo válido (ejemplo@mail.com)");
     } else {
-        input_email.classList.remove('input-error');
-        active_btn_submit[0] = true;
+        isEmailValid = true;
+        clearError(input_email);
     }
-
-    active_btn();
+    toggleSubmit();
 });
 
-input_password.addEventListener('input', (e) => {
+// 🔹 Validación de la contraseña
+input_password.addEventListener("input", (e) => {
     const password = e.target.value.trim();
 
     if (password.length < 6 || password.length > 12) {
-        input_password.classList.add('input-error');
+        isPasswordValid = false;
+        showError(input_password, "La contraseña debe tener entre 6 y 12 caracteres");
     } else {
-        input_password.classList.remove('input-error');
-        active_btn_submit[1] = true;
+        isPasswordValid = true;
+        clearError(input_password);
     }
-
-    active_btn();
+    toggleSubmit();
 });
 
-btn_register.addEventListener('click', () => {window.location.href = '/users/register'});
+// 🔹 Botón para registro
+btn_register.addEventListener("click", () => {
+    window.location.href = "/users/register";
+});

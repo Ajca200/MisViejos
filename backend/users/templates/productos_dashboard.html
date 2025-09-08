@@ -554,5 +554,44 @@ formEditProduct.addEventListener('submit', async (e) => {
 
     
 </script>
+<script>
+  const formAgregarCategoria = document.getElementById('formAgregarCategoria')
 
+  formAgregarCategoria.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    nombre = e.target.nombre.value;
+    descripcion = e.target.descripcion.value
+
+    if (!nombre) {
+      alert('⚠️ debe ingresar un nombre valido para la categoria');
+      return
+    }
+
+    if (!descripcion) {
+      alert('⚠️ debe ingresar una descripcion valida de la categoria')
+      return
+    }
+
+    const formData = new FormData();
+    formData.append('nombre', nombre);
+    formData.append('descripcion', descripcion)
+
+    const response = await fetch('http://127.0.0.1:8000/users/categoria/register',{
+      method: 'POST',
+      body: formData
+    })
+
+    if (response.ok) {
+          const data = await response.json();
+          alert("✅ Categoria Registrada Correctamente.");
+          formAgregarCategoria.reset();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('modalAgregarCategoria'));
+          modal.hide();
+    } else {
+          const errorData = await response.json();
+          alert("❌ Error al registrar: " + (errorData.detail || "Revise los datos."));
+    }
+  })
+</script>
 {% endblock %}

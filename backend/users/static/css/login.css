@@ -1,190 +1,184 @@
-/* Variables CSS */
 :root {
-    --color-primary: #006aff;
-    --color-secondary: #00b900;
-    --color-background: #eff2f2;
-    --color-white: #ffffff;
-    --color-gray: #b5b3b3;
-    --color-light-gray: #f0f0f0;
-    --color-text: #333333;
+  --color-primary: #006aff;
+  --color-secondary: #00b900;
+  --color-background: #f0f4ff;
+  --color-white: #ffffff;
+  --color-gray: #888;
+  --color-text: #222;
 
-    --font-primary: "Roboto", sans-serif;
-    --font-secondary: "Chewy", sans-serif;
+  --font-primary: "Roboto", sans-serif;
+  --font-secondary: "Chewy", cursive;
 
-    --border-radius: 8px;
-    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
 }
 
-/* Reset y estilos base */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: var(--font-primary);
-    background-color: var(--color-background);
-    color: var(--color-text);
-    line-height: 1.6;
+  font-family: var(--font-primary);
+  background: linear-gradient(135deg, #dbe9ff, #f5f9ff);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-main {
-    display: flex;
-    min-height: 100vh; /* Usa min-height para asegurar que ocupe toda la altura */
-    width: 100%;
-    align-items: center; /* Centra verticalmente el contenido de main */
-    justify-content: center; /* Centra horizontalmente el contenido de main */
+/* Contenedor principal */
+.login-container {
+  width: 100%;
+  max-width: 1000px;
+  padding: 1rem;
 }
 
-/* Sección de eslogan */
-.eslogan {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 3rem;
-    color: var(--color-text);
+/* Card principal */
+.login-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--color-white);
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  overflow: hidden;
 }
 
-.eslogan h1 {
-    font-family: var(--font-secondary);
-    color: var(--color-primary);
-    text-transform: uppercase;
-    font-size: clamp(2rem, 5vw, 4rem); /* Tamaño de fuente más adaptable */
-    margin-bottom: 1rem;
+/* Sección izquierda */
+.login-form-section {
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.eslogan p {
-    max-width: 450px; /* Limita el ancho para que el texto sea más legible */
-    font-size: 1.2rem;
+.welcome {
+  font-family: var(--font-secondary);
+  font-size: 2.5rem;
+  color: var(--color-primary);
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
-/* Contenedor del formulario */
-.form-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
+.input-group {
+  margin-bottom: 1.5rem;
 }
 
-.form-container form {
-    background-color: var(--color-white);
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    max-width: 450px;
-    width: 100%;
+.input-group label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--color-gray);
+  margin-bottom: 0.4rem;
 }
 
-/* Estilos de los inputs */
-form input {
-    width: 100%;
-    padding: 1rem;
-    margin-bottom: 1.5rem; /* Aumenta el margen para mejor espaciado */
-    border: 1px solid var(--color-gray);
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+.input-group input {
+  width: 100%;
+  padding: 0.9rem;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  transition: var(--transition);
 }
 
-form input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 106, 255, 0.2);
+.input-group input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0,106,255,0.15);
+  outline: none;
 }
 
-/* Estilos de los botones */
-form button[type="submit"]{
-    width: 100%;
-    background-color: rgb(17, 97, 246);
-    border: none;
-    border-radius: 5px;
-    font-weight: 800;
-    padding: 1rem;
-    color: #ffffff;
-    font-size: large;
-    margin-bottom: .6rem;
+/* Opciones recordar / forgot */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
 }
 
-form button[type="submit"]:disabled{
-    opacity: 0.5;
+.form-options a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
-form button[type="submit"]:active{
-    cursor: pointer;
+.form-options a:hover {
+  color: #004d9a;
+}
+
+/* Botón */
+.btn-submit {
+  width: 100%;
+  padding: 1rem;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-submit:hover {
+  background: #004d9a;
+}
+
+/* Sección derecha */
+.login-illustration {
+  background: var(--color-background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.login-illustration img {
+  max-width: 90%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .login-card {
+    grid-template-columns: 1fr;
+  }
+  .login-illustration {
+    display: none;
+  }
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--color-gray);
+  margin-bottom: 1.5rem;
+}
+
+.form-options.center {
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.form-options.center p {
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.form-options.center a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.error-message {
+    font-size: 0.85rem;
+    color: #ff3333;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    display: block;
 }
 
 .input-error {
-    border: 1px solid #ff0000;
+    border: 1px solid #ff3333 !important;
+    box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
 }
-
-form a {
-    width: 100%;
-    text-decoration: none;
-    color: rgb(28, 120, 225);
-    font-size: medium;
-    display: flex;
-    justify-content: center;
-    margin-bottom: .5rem;
-}
-
-form button[type="button"]{
-    width: 100%;
-    background-color: rgb(19, 204, 19);
-    border: none;
-    border-radius: 5px;
-    font-weight: 800;
-    padding: 1rem;
-    color: #ffffff;
-    font-size: large;
-    margin-bottom: .6rem;
-    cursor: pointer;
-}
-
-/* Enlace de contraseña olvidada */
-form a {
-    display: block;
-    text-align: center;
-    text-decoration: none;
-    color: var(--color-primary);
-    margin-bottom: 1rem;
-    transition: color 0.3s ease;
-}
-
-form a:hover {
-    color: #004d9a;
-}
-
-/* Separador */
-.line {
-    border-top: 1px solid var(--color-gray);
-    margin: 1rem 0;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    main {
-        flex-direction: column;
-        padding: 1rem;
-    }
-    .eslogan,
-    .form-container {
-        width: 100%;
-        padding: 1rem;
-    }
-    .eslogan h1 {
-        font-size: clamp(1.5rem, 8vw, 2.5rem);
-    }
-    .eslogan p {
-        font-size: 1rem;
-    }
-    .form-container form {
-        width: 100%;
-        max-width: 350px;
-        padding: 1.5rem;
-    }
-}
-

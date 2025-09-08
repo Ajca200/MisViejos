@@ -1,47 +1,57 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Chewy&display=swap" rel="stylesheet">
-    <title>Iniciar Sesion</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión - Bodega Mis Viejos</title>
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Chewy&display=swap" rel="stylesheet">
 </head>
 <body>
-    <main>
-        <div class="eslogan">
-            <h1>Bodega Mis Viejos</h1>
-            <p>te acerca a los sabores, aromas y objetos que hacen de cada momento algo especial.</p>
-        </div>
-        <div class="form-container">
-            <!-- <h2>Iniciar Sesion</h2>
-            <p>No te encuentras registrado? <span>haz click</span></p> -->
-            <!-- formulario de inicio de sesion -->
-            <form action="login/auth" method="post">
-                <!-- campo para correo electronico -->
-                <input type="email" name="email" id="email" placeholder="Correo Electronico" required>
+  <main class="login-container">
+    <div class="login-card">
 
-                <!-- campo para la clave -->
-                <input type="password" name="password" id="password" placeholder="Contrasena" required>
+      <!-- Lado izquierdo: formulario -->
+      <div class="login-form-section">
+        <h1 class="welcome">Bienvenido</h1>
+        <p class="subtitle">Accede a tu cuenta para disfrutar de <strong>Bodega Mis Viejos</strong></p>
 
-                <!-- boton de envio -->
-                <button type="submit" id="btn-submit" disabled>Iniciar Sesion</button>
+        <form action="/users/login/auth" method="post" class="login-form">
+          {% csrf_token %}
 
-                <!-- link para en caso de olvido de clave -->
-                <a href="#">Olvidaste la contrasena?</a>
+          <div class="input-group">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" name="email" required>
+          </div>
 
-                <div class="line"></div>
+          <div class="input-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" required>
+          </div>
 
-                <!-- Boton para Registrar nuevos usuarios -->
-                <button type="button" id="btn-register">Crear cuenta nueva</button>
-            </form>
-        </div>
-    </main>
+          <div class="form-options">
+            <label>
+              <input type="checkbox" name="remember"> Recordarme
+            </label>
+            <a href="#">¿Olvidaste tu contraseña?</a>
+          </div>
 
-    <script src="{% static 'js/login.js' %}"></script>
+          <button type="submit" class="btn-submit">Iniciar sesión</button>
+
+          <!-- 🔥 Enlace al registro -->
+          <div class="form-options center">
+            <p>¿No tienes cuenta? <a href="/users/register">Regístrate aquí</a></p>
+          </div>
+        </form>
+      </div>
+
+      <!-- Lado derecho: ilustración -->
+      <div class="login-illustration">
+        <img src="{% static 'images/ilustracion-seguridad.avif' %}" alt="Ilustración de login">
+      </div>
+
+    </div>
+  </main>
 </body>
 </html>

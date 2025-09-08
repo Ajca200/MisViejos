@@ -468,3 +468,18 @@ def ActualizarProducto(request):
 
     except Exception as e:
             return JsonResponse({"detail": str(e)}, status=500)
+    
+@api_view(['POST'])
+def RegistrarCategoriaView(request):
+    nombre = request.data.get('nombre')
+    descripcion = request.data.get('descripcion')
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT * FROM crear_categoria(%s, %s)', [nombre, descripcion])
+            resultado = cursor.fetchone()[0]
+
+            if resultado:
+                return JsonResponse({'exito': resultado})
+    except DatabaseError as e:
+        return HttpResponse(f"<h1>Error en la BD: {str(e)}</h1>", status=400)
